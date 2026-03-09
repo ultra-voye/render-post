@@ -1,6 +1,9 @@
 from os.path import dirname, abspath, join
+import os
 from PIL import Image
 import numpy as np
+from tqdm import tqdm
+import imageio.v2 as imageio
 
 
 ROOT = dirname(abspath(dirname(__file__)))
@@ -100,17 +103,30 @@ def process_img(img):
     return img
 
 
-def get_img(path):
-    img = Image.open(path).convert("RGBA")
-    return img
+def get_imgs(imgs_path):
+    imgs = [Image.open(join(imgs_path, path)).convert("RGBA") for path in sorted(os.listdir(imgs_path))]
+    return imgs
+
+
+def generate_video(output_path, frames, fps=24):
+    with imageio.get_writer(output_path, fps=fps, codec="libx264") as writer:
+        for frame in frames:
+            writer.append_data(np.array(frame.convert("RGB")))
 
 
 def main():
-    imgs_path = join(ROOT, "input", "test.png")
-    output_path = join(ROOT, "output", "output.png")
-    img = get_img(imgs_path)
-    processed_img = process_img(img)
-    processed_img.save(output_path)
+    imgs_path = join(ROOT, "input", "render_blender")
+    output_path = join(ROOT, "output")
+    video_output_path = join(ROOT, "output", "video.mp4")
+    imgs = get_imgs(imgs_path)
+    
+    frames = []
+    for i, img in tqdm(enumerate(imgs)):
+        processed_img = process_img(img)
+        processed_img.save(join(output_path, f"edited_{str(i).zfill(6)}.png"))
+        frames.append(processed_img)
+        
+    generate_video(video_output_path, frames)
     
 
 
