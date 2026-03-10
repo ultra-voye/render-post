@@ -115,7 +115,7 @@ def generate_video(output_path, frames, fps=24):
 
 
 def main():
-    imgs_path = join(ROOT, "input", "render_blender")
+    imgs_path = join(ROOT, "blend_files", "output")
     output_path = join(ROOT, "output")
     video_output_path = join(ROOT, "output", "video.mp4")
     imgs = get_imgs(imgs_path)
